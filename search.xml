@@ -8,8 +8,39 @@
       <link href="/2023/08/25/this-is-a-test/"/>
       <url>/2023/08/25/this-is-a-test/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<p>按照RFC2045的定义，Base64被定义为：<strong>Base64内容传送编码被设计用来把任意序列的8位字节描述为一种不易被人直接识别的形式（The Base64 Content-Transfer-Encoding is designed to represent arbitrary sequences of octets in a form that need not be humanly readable.）</strong></p><p>常见于邮件、http 加密，截取 http 信息，你就会发现登录操作的用户名、密码字段通过 BASE64 加密的。</p><h2 id="Java8之前">Java8之前</h2><p>通过 java 代码实现如下：</p><pre><code class="language-java">    public static void main(String[] args) throws Exception &#123;        String decryptData = &quot;qwe123tdgergd35d&quot;;        System.err.println(&quot;加密前：&quot; + decryptData);        String encryptData = new BASE64Encoder().encode(decryptData.getBytes(&quot;utf-8&quot;));        System.err.println(&quot;加密后：&quot; + encryptData);        System.err.println(&quot;解密后：&quot; + new String(new BASE64Decoder().decodeBuffer(encryptData), &quot;utf-8&quot;));    &#125;</code></pre><p><img src="imgs/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20200820171806.png" alt=""></p><p>主要就是 <code>BASE64Encoder</code>、<code>BASE64Decoder</code> 两个类，我们只需要知道使用对应的方法即可。另，BASE 加密后产生的字节位数是 <code>8</code> 的倍数，如果不够位数以 <code>=</code> 符号填充。</p><hr><h2 id="Java8">Java8</h2><p>在Java 8中，Base64编码已经成为Java类库的标准。</p><p>Java 8 内置了 Base64 编码的编码器和解码器。</p><p>Base64工具类提供了一套静态方法获取下面三种BASE64编解码器：</p><ul><li><p><strong>基本：</strong> 输出被映射到一组字符 <code>A-Za-z0-9+/</code> ，编码不添加任何行标，输出的解码仅支持 <code>A-Za-z0-9+/</code> 。</p></li><li><p><strong>URL：</strong> 输出映射到一组字符 <code>A-Za-z0-9+_</code> ，输出是URL和文件。</p></li><li><p><strong>MIME：</strong> 输出隐射到MIME友好格式。输出每行不超过 <code>76</code> 字符，并且使用<code>'\r'</code>并跟随<code>'\n'</code>作为分割。编码输出最后没有行分割。</p></li></ul><p><strong>内嵌类</strong></p><table><thead><tr><th style="text-align:left">序号</th><th style="text-align:left">内嵌类 &amp; 描述</th></tr></thead><tbody><tr><td style="text-align:left">1</td><td style="text-align:left">static class Base64.Decoder <br> 该类实现一个解码器用于，使用 Base64 编码来解码字节数据。</td></tr><tr><td style="text-align:left">2</td><td style="text-align:left">static class Base64.Encoder <br> 该类实现一个编码器，使用 Base64 编码来编码字节数据。</td></tr></tbody></table><p><strong>方法</strong></p><table><thead><tr><th style="text-align:left">序号</th><th style="text-align:left">方法名 &amp; 描述</th></tr></thead><tbody><tr><td style="text-align:left">1</td><td style="text-align:left">static Base64.Decoder getDecoder() <br> 返回一个 Base64.Decoder ，解码使用基本型 base64 编码方案。</td></tr><tr><td style="text-align:left">2</td><td style="text-align:left">static Base64.Encoder getEncoder() <br> 返回一个 Base64.Encoder ，编码使用基本型 base64 编码方案。</td></tr><tr><td style="text-align:left">3</td><td style="text-align:left">static Base64.Decoder getMimeDecoder() <br> 返回一个 Base64.Decoder ，解码使用 MIME 型 base64 编码方案。</td></tr><tr><td style="text-align:left">4</td><td style="text-align:left">static Base64.Encoder getMimeEncoder() <br> 返回一个 Base64.Encoder ，编码使用 MIME 型 base64 编码方案。</td></tr><tr><td style="text-align:left">5</td><td style="text-align:left">static Base64.Encoder getMimeEncoder(int lineLength, byte[] lineSeparator) <br> 返回一个 Base64.Encoder ，编码使用 MIME 型 base64 编码方案，可以通过参数指定每行的长度及行的分隔符。</td></tr><tr><td style="text-align:left">6</td><td style="text-align:left">static Base64.Decoder getUrlDecoder() <br> 返回一个 Base64.Decoder ，解码使用 URL 和文件名安全型 base64 编码方案。</td></tr><tr><td style="text-align:left">7</td><td style="text-align:left">static Base64.Encoder getUrlEncoder() <br> 返回一个 Base64.Encoder ，编码使用 URL 和文件名安全型 base64 编码方案。</td></tr></tbody></table><p><strong>注意：</strong> Base64 类的很多方法从 java.lang.Object 类继承。</p><p>通过 java 代码实现如下：</p><pre><code class="language-java">    public static void main(String[] args) throws Exception &#123;        String decryptData = &quot;qwww.e123t?a=d35d&quot;;        try &#123;            // 使用基本编码            String base64encodedString = Base64.getEncoder().encodeToString(decryptData.getBytes(&quot;utf-8&quot;));            System.err.println(&quot;Base64 编码字符串 (基本) :&quot; + base64encodedString);            // 解码            byte[] base64decodedBytes = Base64.getDecoder().decode(base64encodedString);            System.err.println(&quot;原始字符串: &quot; + new String(base64decodedBytes, &quot;utf-8&quot;));                        System.err.println(&quot;/////////////////////////////////////////&quot;);                        base64encodedString = Base64.getUrlEncoder().encodeToString(decryptData.getBytes(&quot;utf-8&quot;));            System.err.println(&quot;Base64 编码字符串 (URL) :&quot; + base64encodedString);            decryptData = new String(Base64.getUrlDecoder().decode(base64encodedString.getBytes(&quot;utf-8&quot;)), &quot;utf-8&quot;);            System.err.println(&quot;原始字符串: &quot; + decryptData);                        System.err.println(&quot;/////////////////////////////////////////&quot;);            StringBuilder stringBuilder = new StringBuilder();            for (int i = 0; i &lt; 10; ++i) &#123;                stringBuilder.append(UUID.randomUUID().toString());            &#125;            System.err.println(&quot;MIME加密前：&quot; + stringBuilder.toString());            byte[] mimeBytes = stringBuilder.toString().getBytes(&quot;utf-8&quot;);            String mimeEncodedString = Base64.getMimeEncoder().encodeToString(mimeBytes);            System.err.println(&quot;BMIME加密后：&quot; + mimeEncodedString);            decryptData = new String(Base64.getMimeDecoder().decode(mimeEncodedString.getBytes(&quot;utf-8&quot;)), &quot;utf-8&quot;);            System.err.println(&quot;MIME解密后： &quot; + decryptData);                    &#125; catch (UnsupportedEncodingException e) &#123;            System.err.println(&quot;Error :&quot; + e.getMessage());        &#125;    &#125;</code></pre><p><img src="/imgs/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20200820174320.png" alt=""></p>]]></content>
       
+      
+      <categories>
+          
+          <category> test </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> test </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hello World</title>
+      <link href="/2023/08/25/hello-world/"/>
+      <url>/2023/08/25/hello-world/</url>
+      
+        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start">Quick Start</h2><h3 id="Create-a-new-post">Create a new post</h3><pre><code class="language-bash">$ hexo new &quot;My New Post&quot;</code></pre><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server">Run server</h3><pre><code class="language-bash">$ hexo server</code></pre><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files">Generate static files</h3><pre><code class="language-bash">$ hexo generate</code></pre><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites">Deploy to remote sites</h3><pre><code class="language-bash">$ hexo deploy</code></pre><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 前端开发 </category>
+          
+      </categories>
       
       
     </entry>
@@ -65,25 +96,6 @@
             <tag> 快捷键 </tag>
             
         </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Hello World</title>
-      <link href="/2023/08/24/hello-world/"/>
-      <url>/2023/08/24/hello-world/</url>
-      
-        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start">Quick Start</h2><h3 id="Create-a-new-post">Create a new post</h3><pre><code class="language-bash">$ hexo new &quot;My New Post&quot;</code></pre><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server">Run server</h3><pre><code class="language-bash">$ hexo server</code></pre><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files">Generate static files</h3><pre><code class="language-bash">$ hexo generate</code></pre><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites">Deploy to remote sites</h3><pre><code class="language-bash">$ hexo deploy</code></pre><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 前端开发 </category>
-          
-      </categories>
-      
       
     </entry>
     
